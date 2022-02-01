@@ -1,0 +1,32 @@
+logging:
+  level:
+    root: INFO
+    com:
+      demo: DEBUG
+    httpclient:
+      wire: INFO
+    org:
+      apache:
+        http: INFO
+      springframework:
+        web:
+          client:
+            RestTemplate: INFO
+        integration:
+          endpoint: ERROR
+
+spring:
+  application:
+    name: azure-appservice-demo
+  jackson:
+    default-property-inclusion: NON_NULL
+    date-format: yyyy-MM-dd
+openapi:
+  application-title: Credit Limit
+  application-description: Credit Limit operations like history, update, etc
+  application-version: 1.0
+  contact:
+    email: demo@demo.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html

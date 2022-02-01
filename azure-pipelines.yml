@@ -1,0 +1,51 @@
+# Maven package Java project Web App to Linux on Azure
+# Build your Java project and deploy it to Azure as a Linux web app
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- develop
+- main
+
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    name: DevLinuxPool
+  steps:
+  - checkout: self
+  - task: Maven@3
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      codeCoverageToolOption: 'jaCoCo'
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      goals: 'clean package'
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Pipeline Artifact
+    inputs:
+        path: $(System.DefaultWorkingDirectory)
+        artifactName: TestPublish
+  - task: CopyFiles@2
+    displayName: Copy Files
+    inputs:
+      SourceFolder: $(system.defaultworkingdirectory)
+      Contents: '**/target/*.?(war|jar)'
+      TargetFolder: $(build.artifactstagingdirectory)   
+
+  - task: ArchiveFiles@2
+    displayName: 'Archive $(build.artifactstagingdirectory)/target'
+    inputs:
+      rootFolderOrFile: '$(build.artifactstagingdirectory)/target'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.artifactStagingDirectory)/$(Build.BuildId)/app.zip'
+      replaceExistingArchive: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Artifact
+    inputs:
+      PathtoPublish: $(Build.artifactStagingDirectory)/$(Build.BuildId)/app.zip
